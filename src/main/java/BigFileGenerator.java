@@ -28,7 +28,10 @@ public class BigFileGenerator
     public static void main(String[] args) {
         try
         {
-            createBigFile("",1024*1024);
+            long start = System.currentTimeMillis();
+            System.out.println("生成大文本文件");
+            createBigFile("",200*1024*1024);
+            System.out.println("生成完毕 共用时"+(System.currentTimeMillis()-start));
         }
         catch (Exception e)
         {

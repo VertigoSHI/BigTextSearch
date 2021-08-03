@@ -23,6 +23,8 @@ public class DataSplitManager
         fileList = Collections.synchronizedList(new LinkedList<>());
         hashReaderList = new ConcurrentHashMap<>(num);
         hashWriterList = new ConcurrentHashMap<>(num);
+        System.out.println("-------启动初始化 数据分集文件夹位于 "+path+"/"+"Dataset"+"-------");
+        long start = System.currentTimeMillis();
         File folder = new File(path+"/"+"Dataset");
         if(!folder.exists())
         {
@@ -41,16 +43,18 @@ public class DataSplitManager
                 fileList.add(file);
                 hashReaderList.put(n,new BufferedReader(new FileReader(file)));
                 hashWriterList.put(n,new FileOutputStream(file));
+                System.out.println("初始化数据集 DataSet"+n+".txt");
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
         });
+        System.out.println("------------初始化结束 共耗时"+(System.currentTimeMillis()-start)+"--------------");
     }
-    public static void dataGiveOut(Data data) throws IOException {
+    public static void dataGiveOut(Data data) throws IOException
+    {
         FileOutputStream fileOutputStream = hashWriterList.get(Math.abs(data.hashCode())%num);
-
         if(fileOutputStream!=null)
         {
             fileOutputStream.write(data.toString().getBytes(StandardCharsets.UTF_8));
@@ -65,6 +69,8 @@ public class DataSplitManager
     {
         //全局最优文件
        final Data result = new Data(Integer.MAX_VALUE,null);
+       long start = System.currentTimeMillis();
+        System.out.println("--------进行结果计算--------");
         hashReaderList.entrySet().parallelStream().forEach(hash_reader_entry->{
             //对每个文件进行处理
             //复写过HashCode函数 按字符串hash 并且计算出现次数
@@ -108,6 +114,7 @@ public class DataSplitManager
             //永远不要在程序中显式的调用gc
             //System.gc();
         });
+        System.out.println("----------- 搜寻结果结束"+(System.currentTimeMillis()-start)+"----------");
         return result;
     }
 
